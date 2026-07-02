@@ -20,8 +20,6 @@ def silver_customers():
     return (
         dlt.read("bronze_customers")
             .dropDuplicates(["Customer_ID"])
-            .withColumn("Registration_Date", excel_to_date("Registration_Date"))
-            .withColumn("Date_of_Birth", excel_to_date("Date_of_Birth"))
             .withColumn("City", trim(col("City")))
             .withColumn("State", trim(col("State")))
             .withColumn("Gender", trim(col("Gender")))
