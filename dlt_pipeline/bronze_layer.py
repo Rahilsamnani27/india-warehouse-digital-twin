@@ -67,5 +67,6 @@ def bronze_payments():
             .option("inferSchema", "true")
             .csv(f"{DBFS_RAW_PATH}Payments.csv")
             .withColumn("_ingested_at", current_timestamp())
+            .withColumnRenamed("Quantity (nos.)", "Quantity")
             .withColumn("_pipeline_layer", lit("bronze"))
     )
