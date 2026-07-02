@@ -1,32 +1,69 @@
 import dlt
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp, input_file_name, lit
+from pyspark.sql.functions import current_timestamp, lit, input_file_name
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-S3_RAW_PATH = "s3://india-warehouse-digital-twin/raw/warehouse_events/"
+DBFS_RAW_PATH = "dbfs:/warehouse/raw/"
 
-# ── Bronze Layer ───────────────────────────────────────────────────────────────
-# Ingests raw CSV data from S3 into Delta Lake as-is with metadata columns.
-# No transformations — full fidelity of source data is preserved.
-
+# ── Bronze: Customers ──────────────────────────────────────────────────────────
 @dlt.table(
-    name="bronze_warehouse_events",
-    comment="Raw warehouse operational events ingested from S3. No transformations applied.",
-    table_properties={
-        "quality": "bronze",
-        "pipelines.autoOptimize.managed": "true",
-    }
+    name="bronze_customers",
+    comment="Raw customers data ingested from DBFS",
+    table_properties={"quality": "bronze"}
 )
-def bronze_warehouse_events():
+def bronze_customers():
     return (
-        spark.readStream
-            .format("cloudFiles")                      # Auto Loader for incremental S3 ingestion
-            .option("cloudFiles.format", "csv")
-            .option("cloudFiles.schemaLocation", "dbfs:/checkpoints/bronze/schema")
-            .option("cloudFiles.inferColumnTypes", "true")
+        spark.read
             .option("header", "true")
-            .load(S3_RAW_PATH)
-            .withColumn("_ingested_at", current_timestamp())       # audit column
-            .withColumn("_source_file", input_file_name())         # traceability
+            .option("inferSchema", "true")
+            .csv(f"{DBFS_RAW_PATH}Customers.csv")
+            .withColumn("_ingested_at", current_timestamp())
+            .withColumn("_pipeline_layer", lit("bronze"))
+    )
+
+# ── Bronze: Products ───────────────────────────────────────────────────────────
+@dlt.table(
+    name="bronze_products",
+    comment="Raw products data ingested from DBFS",
+    table_properties={"quality": "bronze"}
+)
+def bronze_products():
+    return (
+        spark.read
+            .option("header", "true")
+            .option("inferSchema", "true")
+            .csv(f"{DBFS_RAW_PATH}Products.csv")
+            .withColumn("_ingested_at", current_timestamp())
+            .withColumn("_pipeline_layer", lit("bronze"))
+    )
+
+# ── Bronze: Orders ─────────────────────────────────────────────────────────────
+@dlt.table(
+    name="bronze_orders",
+    comment="Raw orders data ingested from DBFS",
+    table_properties={"quality": "bronze"}
+)
+def bronze_orders():
+    return (
+        spark.read
+            .option("header", "true")
+            .option("inferSchema", "true")
+            .csv(f"{DBFS_RAW_PATH}Orders.csv")
+            .withColumn("_ingested_at", current_timestamp())
+            .withColumn("_pipeline_layer", lit("bronze"))
+    )
+
+# ── Bronze: Payments ───────────────────────────────────────────────────────────
+@dlt.table(
+    name="bronze_payments",
+    comment="Raw payments data ingested from DBFS",
+    table_properties={"quality": "bronze"}
+)
+def bronze_payments():
+    return (
+        spark.read
+            .option("header", "true")
+            .option("inferSchema", "true")
+            .csv(f"{DBFS_RAW_PATH}Payments.csv")
+            .withColumn("_ingested_at", current_timestamp())
             .withColumn("_pipeline_layer", lit("bronze"))
     )
