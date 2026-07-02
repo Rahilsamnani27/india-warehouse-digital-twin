@@ -5,7 +5,8 @@ from pyspark.sql.functions import (
 )
 
 def excel_to_date(col_name):
-    return expr(f"date_add(to_date('1899-12-30'), CAST(`{col_name}` AS INT))")
+    return expr(f"date_add(to_date('1899-12-30'), CAST({col_name} AS INT))")
+    
 
 # ── Silver: Customers ──────────────────────────────────────────────────────────
 @dlt.table(
