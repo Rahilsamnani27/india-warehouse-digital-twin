@@ -1,11 +1,9 @@
 import dlt
 from pyspark.sql.functions import (
-    col, trim, upper, lower, when, current_timestamp, lit,
+    col, trim, when, current_timestamp, lit,
     regexp_replace, to_date, expr, round
 )
 
-# ── Excel serial date converter ────────────────────────────────────────────────
-# Excel epoch starts 1899-12-30
 def excel_to_date(col_name):
     return expr(f"date_add(to_date('1899-12-30'), CAST(`{col_name}` AS INT))")
 
@@ -53,8 +51,6 @@ def silver_products():
     return (
         dlt.read("bronze_products")
             .dropDuplicates(["Product_ID"])
-            .withColumnRenamed("Stock_Quantity (nos.)", "Stock_Quantity")
-            .withColumnRenamed("Profit Margin", "Profit_Margin")
             .withColumn("Category", trim(col("Category")))
             .withColumn("Brand", trim(col("Brand")))
             .withColumn("Product_Status", trim(col("Product_Status")))
@@ -84,7 +80,6 @@ def silver_orders():
     return (
         dlt.read("bronze_orders")
             .dropDuplicates(["Order_ID"])
-            .withColumnRenamed("Quantity (nos.)", "Quantity")
             .withColumn("Order_Date", excel_to_date("Order_Date"))
             .withColumn("Order_Status", trim(col("Order_Status")))
             .withColumn("Payment_Mode", trim(col("Payment_Mode")))
@@ -102,7 +97,7 @@ def silver_orders():
 # ── Silver: Payments ───────────────────────────────────────────────────────────
 @dlt.table(
     name="silver_payments",
-    comment="Cleaned payments with currency symbols removed and empty columns dropped",
+    comment="Cleaned payments with currency symbols removed",
     table_properties={"quality": "silver"}
 )
 @dlt.expect_or_drop("valid_payment_id", "Payment_ID IS NOT NULL")
@@ -112,23 +107,20 @@ def silver_payments():
     return (
         dlt.read("bronze_payments")
             .dropDuplicates(["Payment_ID"])
-            # Drop empty columns
-            .drop("_c9", "_c10", "_c11", "_c12")
-            # Clean currency columns
             .withColumn(
-    "Transaction_Fee",
-    regexp_replace(
-        regexp_replace(col("` Transaction_Fee `"), "₹", ""),
-        ",", ""
-    ).cast("double")
-)
-.withColumn(
-    "Refund_Amount",
-    regexp_replace(
-        regexp_replace(col("` Refund_Amount `"), "₹", ""),
-        ",", ""
-    ).cast("double")
-)
+                "Transaction_Fee",
+                regexp_replace(
+                    regexp_replace(col("Transaction_Fee"), "₹", ""),
+                    ",", ""
+                ).cast("double")
+            )
+            .withColumn(
+                "Refund_Amount",
+                regexp_replace(
+                    regexp_replace(col("Refund_Amount"), "₹", ""),
+                    ",", ""
+                ).cast("double")
+            )
             .withColumn("Payment_Status", trim(col("Payment_Status")))
             .withColumn("Payment_Mode", trim(col("Payment_Mode")))
             .withColumn(
