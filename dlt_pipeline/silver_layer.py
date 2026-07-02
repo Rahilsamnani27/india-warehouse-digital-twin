@@ -116,19 +116,19 @@ def silver_payments():
             .drop("_c9", "_c10", "_c11", "_c12")
             # Clean currency columns
             .withColumn(
-                "Transaction_Fee",
-                regexp_replace(
-                    regexp_replace(col("Transaction_Fee"), "₹", ""),
-                    ",", ""
-                ).cast("double")
-            )
-            .withColumn(
-                "Refund_Amount",
-                regexp_replace(
-                    regexp_replace(col("Refund_Amount"), "₹", ""),
-                    ",", ""
-                ).cast("double")
-            )
+    "Transaction_Fee",
+    regexp_replace(
+        regexp_replace(col("` Transaction_Fee `"), "₹", ""),
+        ",", ""
+    ).cast("double")
+)
+.withColumn(
+    "Refund_Amount",
+    regexp_replace(
+        regexp_replace(col("` Refund_Amount `"), "₹", ""),
+        ",", ""
+    ).cast("double")
+)
             .withColumn("Payment_Status", trim(col("Payment_Status")))
             .withColumn("Payment_Mode", trim(col("Payment_Mode")))
             .withColumn(

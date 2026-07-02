@@ -13,9 +13,12 @@ from pyspark.sql.functions import (
 def gold_revenue_by_category_city():
     orders = dlt.read("silver_orders")
     products = dlt.read("silver_products")
+    customers = dlt.read("silver_customers")
 
     return (
-        orders.join(products, on="Product_ID", how="left")
+        orders
+            .join(products, on="Product_ID", how="left")
+            .join(customers, on="Customer_ID", how="left")
             .groupBy("Category", "City")
             .agg(
                 round(sum("Total_Amount"), 2).alias("total_revenue"),
@@ -81,7 +84,7 @@ def gold_payment_analytics():
                 sum(when(col("Payment_Status") == "Success", 1).otherwise(0)).alias("successful_payments"),
                 sum(when(col("Payment_Status") == "Failed", 1).otherwise(0)).alias("failed_payments"),
                 round(sum("Refund_Amount"), 2).alias("total_refunds"),
-                round(sum("Transaction_Fee"), 2).alias("total_transaction_fees")
+                round(sum(col("`Transaction_Fee`")), 2).alias("total_transaction_fees")
             )
             .withColumn(
                 "failure_rate_pct",
