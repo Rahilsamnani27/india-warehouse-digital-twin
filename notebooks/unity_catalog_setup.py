@@ -4,7 +4,7 @@ spark = SparkSession.builder.getOrCreate()
 # ── Register Bronze Tables ─────────────────────────────────────────────────────
 for table in ["bronze_customers", "bronze_products", "bronze_orders", "bronze_payments"]:
     spark.sql(f"""
-        ALTER TABLE workspace.default.{table}
+        ALTER VIEW workspace.default.{table}
         SET TBLPROPERTIES (
             'layer' = 'bronze',
             'source' = '/Volumes/workspace/default/raw_data/',
@@ -15,7 +15,7 @@ for table in ["bronze_customers", "bronze_products", "bronze_orders", "bronze_pa
 # ── Register Silver Tables ─────────────────────────────────────────────────────
 for table in ["silver_customers", "silver_products", "silver_orders", "silver_payments"]:
     spark.sql(f"""
-        ALTER TABLE workspace.default.{table}
+        ALTER VIEW workspace.default.{table}
         SET TBLPROPERTIES (
             'layer' = 'silver',
             'team'  = 'data-engineering'
@@ -30,7 +30,7 @@ for table in [
     "gold_stock_risk"
 ]:
     spark.sql(f"""
-        ALTER TABLE workspace.default.{table}
+        ALTER VIEW workspace.default.{table}
         SET TBLPROPERTIES (
             'layer' = 'gold',
             'team'  = 'data-engineering'
