@@ -1,41 +1,17 @@
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.getOrCreate()
 
-# ── Register Bronze Tables ─────────────────────────────────────────────────────
-for table in ["bronze_customers", "bronze_products", "bronze_orders", "bronze_payments"]:
-    spark.sql(f"""
-        ALTER VIEW workspace.default.{table}
-        SET TBLPROPERTIES (
-            'layer' = 'bronze',
-            'source' = '/Volumes/workspace/default/raw_data/',
-            'team'  = 'data-engineering'
-        )
-    """)
+# Verify all tables are registered in Unity Catalog
+tables = [
+    "bronze_customers", "bronze_products", "bronze_orders", "bronze_payments",
+    "silver_customers", "silver_products", "silver_orders", "silver_payments",
+    "gold_revenue_by_category_city", "gold_customer_performance",
+    "gold_payment_analytics", "gold_stock_risk"
+]
 
-# ── Register Silver Tables ─────────────────────────────────────────────────────
-for table in ["silver_customers", "silver_products", "silver_orders", "silver_payments"]:
-    spark.sql(f"""
-        ALTER VIEW workspace.default.{table}
-        SET TBLPROPERTIES (
-            'layer' = 'silver',
-            'team'  = 'data-engineering'
-        )
-    """)
+for table in tables:
+    count = spark.sql(f"SELECT COUNT(*) FROM workspace.default.{table}").collect()[0][0]
+    print(f"{table}: {count} rows")
 
-# ── Register Gold Tables ───────────────────────────────────────────────────────
-for table in [
-    "gold_revenue_by_category_city",
-    "gold_customer_performance",
-    "gold_payment_analytics",
-    "gold_stock_risk"
-]:
-    spark.sql(f"""
-        ALTER VIEW workspace.default.{table}
-        SET TBLPROPERTIES (
-            'layer' = 'gold',
-            'team'  = 'data-engineering'
-        )
-    """)
-
-print("Unity Catalog metadata registered successfully.")
+print("\nAll tables registered in Unity Catalog.")
 print("Lineage visible in Databricks UI → Catalog → workspace → default")
