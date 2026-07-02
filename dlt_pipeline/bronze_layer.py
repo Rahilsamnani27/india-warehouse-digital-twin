@@ -2,7 +2,7 @@ import dlt
 from pyspark.sql.functions import current_timestamp, lit, input_file_name
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-DBFS_RAW_PATH = "dbfs:/warehouse/raw/"
+DBFS_RAW_PATH = "/Volumes/workspace/default/raw_data/"
 
 # ── Bronze: Customers ──────────────────────────────────────────────────────────
 @dlt.table(
