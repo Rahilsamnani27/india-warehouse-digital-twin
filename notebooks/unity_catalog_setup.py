@@ -20,7 +20,6 @@ for table in ["bronze_customers", "bronze_products", "bronze_orders", "bronze_pa
     spark.sql(f"""
         ALTER TABLE ecommerce_catalog.bronze.{table}
         SET TBLPROPERTIES (
-            'owner'       = 'rahil',
             'layer'       = 'bronze',
             'source'      = 'dbfs:/warehouse/raw/',
             'team'        = 'data-engineering'
@@ -32,7 +31,6 @@ for table in ["silver_customers", "silver_products", "silver_orders", "silver_pa
     spark.sql(f"""
         ALTER TABLE ecommerce_catalog.silver.{table}
         SET TBLPROPERTIES (
-            'owner'       = 'rahil',
             'layer'       = 'silver',
             'team'        = 'data-engineering'
         )
@@ -48,7 +46,6 @@ for table in [
     spark.sql(f"""
         ALTER TABLE ecommerce_catalog.gold.{table}
         SET TBLPROPERTIES (
-            'owner'       = 'rahil',
             'layer'       = 'gold',
             'team'        = 'data-engineering'
         )
