@@ -32,6 +32,8 @@ def bronze_products():
             .option("header", "true")
             .option("inferSchema", "true")
             .csv(f"{DBFS_RAW_PATH}Products.csv")
+            .withColumnRenamed("Stock_Quantity (nos.)", "Stock_Quantity")
+            .withColumnRenamed("Profit Margin", "Profit_Margin")
             .withColumn("_ingested_at", current_timestamp())
             .withColumn("_pipeline_layer", lit("bronze"))
     )
