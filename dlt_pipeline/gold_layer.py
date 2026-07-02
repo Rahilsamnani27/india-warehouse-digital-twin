@@ -78,7 +78,7 @@ def gold_payment_analytics():
 
     return (
         payments.join(orders, on="Order_ID", how="left")
-            .groupBy("Payment_Mode")
+            .groupBy(payments["Payment_Mode"])
             .agg(
                 count("Payment_ID").alias("total_transactions"),
                 sum(when(col("Payment_Status") == "Success", 1).otherwise(0)).alias("successful_payments"),
