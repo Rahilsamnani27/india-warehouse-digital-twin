@@ -1,4 +1,4 @@
-# 🇮🇳 Indian E-Commerce Analytics Pipeline
+# Indian E-Commerce Analytics Pipeline
 
 An end-to-end data engineering pipeline built on Databricks that ingests real Indian e-commerce data across customers, orders, products and payments, transforms it through a Bronze-Silver-Gold Delta Lake architecture using Delta Live Tables, and computes business insights including revenue analytics, customer segmentation, payment failure rates and stock-out risk — all governed through Unity Catalog.
 
