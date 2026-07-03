@@ -28,7 +28,7 @@ The pipeline detects payment failure patterns, flags products at stock-out risk,
 
 # 🏗️ Architecture
 
-![Architecture Diagram](screenshots/architecture_diagram.svg)
+![Architecture Diagram](screenshots/ecommerce_pipeline_architecture_v2.svg)
 
 ---
 
